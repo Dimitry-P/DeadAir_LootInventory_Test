@@ -1,4 +1,4 @@
-
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +14,7 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private GameObject itemEntryPrefab;
     [SerializeField] private TMP_Text weightText;
     [SerializeField] private Button dismantleButton;
+    [SerializeField] private TMP_Text notificationText;
 
     private ItemData selectedItem;
 
@@ -22,6 +23,7 @@ public class InventoryUI : MonoBehaviour
         if (inventory != null)
         {
             inventory.OnInventoryChanged += RefreshUI;
+            inventory.OnInventoryNotification += ShowNotification;
         }
 
         if (dismantleButton != null)
@@ -30,17 +32,23 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-   private void Start()
-   {
-       RefreshUI();
-       inventoryPanel.SetActive(false);
-   }
+    private void Start()
+    {
+        if (notificationText != null)
+        {
+            notificationText.enabled = false;
+        }
+
+        RefreshUI();
+        inventoryPanel.SetActive(false);
+    }
 
     private void OnDisable()
     {
         if (inventory != null)
         {
             inventory.OnInventoryChanged -= RefreshUI;
+            inventory.OnInventoryNotification -= ShowNotification;
         }
 
         if (dismantleButton != null)
@@ -143,5 +151,30 @@ public class InventoryUI : MonoBehaviour
             selectedItem = null;
             RefreshUI();
         }
+    }
+    private Coroutine notificationCoroutine;
+
+    private void ShowNotification(string message)
+    {
+        if (notificationText == null)
+            return;
+
+        if (notificationCoroutine != null)
+        {
+            StopCoroutine(notificationCoroutine);
+        }
+
+        notificationText.text = message;
+        notificationText.enabled = true;
+
+        notificationCoroutine = StartCoroutine(HideNotification());
+    }
+
+    private IEnumerator HideNotification()
+    {
+        yield return new WaitForSeconds(3f);
+
+        notificationText.enabled = false;
+        notificationCoroutine = null;
     }
 }

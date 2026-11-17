@@ -13,6 +13,7 @@ public class InventorySlot
 public class Inventory : MonoBehaviour
 {
     public event Action OnInventoryChanged;
+    public event Action<string> OnInventoryNotification;
     [Header("Inventory Settings")]
     [Min(0.1f)]
     public float maxWeight = 20f;
@@ -48,19 +49,13 @@ public class Inventory : MonoBehaviour
 
         float incomingWeight = item.weight * amount;
         
-        Debug.Log(
-            $"Weight={item.weight}, " +
-            $"Amount={amount}, " +
-            $"IncomingWeight={incomingWeight}, " +
-            $"CurrentWeight={CurrentWeight}, " +
-            $"MaxWeight={maxWeight}"
-        );
-
-        Debug.Log(
-            $"{CurrentWeight + incomingWeight > maxWeight}"
-        );
         if (CurrentWeight + incomingWeight > maxWeight)
         {
+            string message =
+                $"Inventory is full! Cannot pick up {item.itemName}.";
+
+            OnInventoryNotification?.Invoke(message);
+
             Debug.LogWarning(
                 $"Cannot pick up {item.itemName}: inventory is full! " +
                 $"Current weight: {CurrentWeight}/{maxWeight}."
