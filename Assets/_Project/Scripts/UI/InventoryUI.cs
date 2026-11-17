@@ -32,6 +32,7 @@ public class InventoryUI : MonoBehaviour
     private void Start()
     {
         RefreshUI();
+        gameObject.SetActive(true);
     }
 
     private void OnDisable()
