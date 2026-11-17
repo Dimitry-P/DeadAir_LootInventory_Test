@@ -19,4 +19,4 @@ MonoBehaviour:
   pickupMode: 1
   dismantleResults:
   - item: {fileID: 11400000, guid: c175fb9dbc813a542a0ea31f272b8ded, type: 2}
-    amount: 1
+    amount: 2

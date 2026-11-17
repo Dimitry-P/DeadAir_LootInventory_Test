@@ -12,6 +12,7 @@ public class InventorySlot
 
 public class Inventory : MonoBehaviour
 {
+    public event Action OnInventoryChanged;
     [Header("Inventory Settings")]
     [Min(0.1f)]
     public float maxWeight = 20f;
@@ -106,6 +107,73 @@ public class Inventory : MonoBehaviour
 
         Debug.Log(
             $"Picked up {amount} x {item.itemName}. " +
+            $"Inventory weight: {CurrentWeight}/{maxWeight}."
+        );
+        OnInventoryChanged?.Invoke();
+        return true;
+    }
+    
+    public bool DismantleItem(ItemData item)
+    {
+        if (item == null || item.dismantleResults == null ||
+            item.dismantleResults.Count == 0)
+        {
+            Debug.LogWarning("Cannot dismantle item: no dismantling results.");
+            return false;
+        }
+
+        // Find one item in the inventory.
+        InventorySlot slotToRemove = slots.Find(
+            slot => slot.item == item && slot.quantity > 0
+        );
+
+        if (slotToRemove == null)
+        {
+            Debug.LogWarning($"Cannot dismantle {item.itemName}: item not found.");
+            return false;
+        }
+
+        // Validate dismantling results and calculate their total weight.
+        float resultsWeight = 0f;
+
+        foreach (DismantleResult result in item.dismantleResults)
+        {
+            if (result == null || result.item == null || result.amount <= 0)
+            {
+                Debug.LogWarning("Cannot dismantle item: invalid dismantling result.");
+                return false;
+            }
+
+            resultsWeight += result.item.weight * result.amount;
+        }
+
+        // Check inventory weight after dismantling.
+        float resultingWeight = CurrentWeight - item.weight + resultsWeight;
+
+        if (resultingWeight > maxWeight)
+        {
+            Debug.LogWarning(
+                $"Cannot dismantle {item.itemName}: inventory weight limit exceeded."
+            );
+            return false;
+        }
+
+        // Remove one item from the inventory.
+        slotToRemove.quantity--;
+
+        if (slotToRemove.quantity <= 0)
+        {
+            slots.Remove(slotToRemove);
+        }
+
+        // Add dismantling results.
+        foreach (DismantleResult result in item.dismantleResults)
+        {
+            AddItem(result.item, result.amount);
+        }
+
+        Debug.Log(
+            $"Dismantled {item.itemName}. " +
             $"Inventory weight: {CurrentWeight}/{maxWeight}."
         );
 
