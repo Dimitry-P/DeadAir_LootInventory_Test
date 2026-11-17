@@ -49,7 +49,6 @@ public class Inventory : MonoBehaviour
         float incomingWeight = item.weight * amount;
         
         Debug.Log(
-            $"DEBUG: Item={item.itemName}, " +
             $"Weight={item.weight}, " +
             $"Amount={amount}, " +
             $"IncomingWeight={incomingWeight}, " +
@@ -58,7 +57,6 @@ public class Inventory : MonoBehaviour
         );
 
         Debug.Log(
-            $"CHECK: {CurrentWeight + incomingWeight} > {maxWeight} = " +
             $"{CurrentWeight + incomingWeight > maxWeight}"
         );
         if (CurrentWeight + incomingWeight > maxWeight)

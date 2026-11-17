@@ -9,6 +9,7 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private Inventory inventory;
 
     [Header("UI References")]
+    [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private Transform itemListParent;
     [SerializeField] private GameObject itemEntryPrefab;
     [SerializeField] private TMP_Text weightText;
@@ -29,11 +30,11 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        RefreshUI();
-        gameObject.SetActive(true);
-    }
+   private void Start()
+   {
+       RefreshUI();
+       inventoryPanel.SetActive(false);
+   }
 
     private void OnDisable()
     {
@@ -115,7 +116,21 @@ public class InventoryUI : MonoBehaviour
             selectedItem.dismantleResults != null &&
             selectedItem.dismantleResults.Count > 0;
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            inventoryPanel.SetActive(!inventoryPanel.activeSelf);
 
+            bool inventoryIsOpen = inventoryPanel.activeSelf;
+
+            Cursor.lockState = inventoryIsOpen
+                ? CursorLockMode.None
+                : CursorLockMode.Locked;
+
+            Cursor.visible = inventoryIsOpen;
+        }
+    }
     private void DismantleSelectedItem()
     {
         if (inventory == null || selectedItem == null)
